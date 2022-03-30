@@ -229,9 +229,12 @@ public class ConsumingRestApplication {
     }
 
     /**
-     * Uses the Polaris Personal Access Token to obtain a JWT token for further calls.  This token is short-lived, so you may need to repeat this authentication several times during a long script execution
+     * Uses the Polaris Personal Access Token to obtain a JWT token for further calls.  This token is short-lived, so
+     * you may need to repeat this authentication several times during a long script execution
+     *
      * @param restTemplate
-     * @return JWT Token needed for subsequent API calls.  Used as a header as follows {@code headers.set("Authorization", "Bearer " + jwt);}
+     * @return JWT Token needed for subsequent API calls.  Used as a header as follows {@code headers.set
+     * ("Authorization", "Bearer " + jwt);}
      */
     private String authenticateToPolaris(RestTemplate restTemplate) {
         HttpHeaders headers = new HttpHeaders();
@@ -261,7 +264,6 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
      * @param jwt
      * @param applicationId unique identifier for the Applications in Polaris
@@ -294,6 +296,7 @@ public class ConsumingRestApplication {
 
     /**
      * Extract project urls from project data in the API
+     *
      * @param projects_list
      * @return list of project urls
      */
@@ -307,10 +310,9 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
      * @param jwt
-     * @param projectId unique identifier for the Project in Polaris
+     * @param projectId    unique identifier for the Project in Polaris
      * @return the human-readable name of the Project in Polaris
      */
     private String getProjectNamePolaris(RestTemplate restTemplate, String jwt, String projectId) {
@@ -334,10 +336,9 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
      * @param jwt
-     * @param projectId unique identifier for the Project in Polaris
+     * @param projectId    unique identifier for the Project in Polaris
      * @return the unique identifier for the default Branch for this Project in Polaris
      */
     private String getProjectDefaultBranchPolaris(RestTemplate restTemplate, String jwt, String projectId) {
@@ -381,12 +382,12 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
      * @param jwt
-     * @param projectId unique identifier for the Project in Polaris
-     * @param branchId unique identifier for the Branch in Polaris
-     * @return a JSONObject representing the issues retrieved by the API.  The object contains an array of "data" which is a list of issues
+     * @param projectId    unique identifier for the Project in Polaris
+     * @param branchId     unique identifier for the Branch in Polaris
+     * @return a JSONObject representing the issues retrieved by the API.  The object contains an array of "data"
+     * which is a list of issues
      */
     private JSONObject getIssuesPolaris(RestTemplate restTemplate, String jwt, String projectId, String branchId) {
         String issues_url = POLARIS_BASE_URL + "/api/query/v1/issues";
@@ -416,9 +417,11 @@ public class ConsumingRestApplication {
 
     /**
      * This object is useful for determining issue severity based on the issue type id/issue name
+     *
      * @param restTemplate
      * @param jwt
-     * @return The JSON Object representing the taxonomy that organizes all Polaris detectable issues into a severity category
+     * @return The JSON Object representing the taxonomy that organizes all Polaris detectable issues into a severity
+     * category
      */
     private JSONObject getSeverityTaxonomyPolaris(RestTemplate restTemplate, String jwt) {
         String url = POLARIS_BASE_URL + "/api/taxonomy/v0/taxonomies";
@@ -457,10 +460,12 @@ public class ConsumingRestApplication {
     }
 
     /**
-     * Given an issue type id from the issue query, find the human-readable name for that issue which is also helpful for severity lookup
+     * Given an issue type id from the issue query, find the human-readable name for that issue which is also helpful
+     * for severity lookup
+     *
      * @param restTemplate
      * @param jwt
-     * @param issueTypeId unique identifier for the issue type
+     * @param issueTypeId  unique identifier for the issue type
      * @return human-readable issue name
      */
     private String getIssueTypeNamePolaris(RestTemplate restTemplate, String jwt, String issueTypeId) {
@@ -489,12 +494,11 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
      * @param jwt
-     * @param issueId unique identifier for a specific Issue in Polaris
-     * @param projectId unique identifier for a Project in Polaris
-     * @param branchId unique identifier for a Branch in Polaris
+     * @param issueId      unique identifier for a specific Issue in Polaris
+     * @param projectId    unique identifier for a Project in Polaris
+     * @param branchId     unique identifier for a Branch in Polaris
      * @return detailed data about the issue, including triage transitions and last detected time
      */
     private JSONObject getIssueDeepDataPolaris(RestTemplate restTemplate, String jwt, String issueId,
@@ -525,7 +529,6 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param issueDeepData detailed issue data provided by the API
      * @return most recent date when the issue transitioned to an Open state.  A decent proxy for first seen date.
      */
@@ -559,11 +562,10 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
      * @param jwt
-     * @param projectId unique identifier for a Project in Polaris
-     * @param issueKey another unique identifier for an Issue in a Project
+     * @param projectId    unique identifier for a Project in Polaris
+     * @param issueKey     another unique identifier for an Issue in a Project
      * @return current triage status data for this Issue
      */
     private JSONObject getTriageDataPolaris(RestTemplate restTemplate, String jwt, String projectId, String issueKey) {
@@ -592,6 +594,7 @@ public class ConsumingRestApplication {
 
     /**
      * Parse the triage data from the API call and determine current status
+     *
      * @param triageData
      * @return
      */
@@ -617,9 +620,8 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
-     * @param projectId unique identifier for a Project in Code Dx
+     * @param projectId    unique identifier for a Project in Code Dx
      * @return The human-readable name for a Project in Code Dx
      */
     private String getCodeDxProjectName(RestTemplate restTemplate, String projectId) {
@@ -645,9 +647,9 @@ public class ConsumingRestApplication {
     }
 
     /**
-     *
      * @param restTemplate
-     * @param parentProjectId unique identifier for a parent Project of interest in Code Dx.  Similar to an Application in Polaris
+     * @param parentProjectId unique identifier for a parent Project of interest in Code Dx.  Similar to an
+     *                        Application in Polaris
      * @return list of child Projects directly under the parent Project
      */
     private JSONArray getCodeDxChildProject(RestTemplate restTemplate, String parentProjectId) {
@@ -662,6 +664,8 @@ public class ConsumingRestApplication {
                 .buildAndExpand()
                 .toUriString();
 
+        // TODO: due to a bug offset and limit are logically swapped in the back end as of v2022.1.2.  This will need
+        //  to be swapped back when that is fixed in the API
         HttpEntity<String> request = new HttpEntity<>("{\"offset\": 100, \"limit\": 0, \"filter\": " +
                 "{\"parentId\": " + parentProjectId + "}}", headers);
 
@@ -677,6 +681,7 @@ public class ConsumingRestApplication {
     /**
      * Recursively search a project through all children and return a collection of all issues.
      * TODO: may need to paginate this depending on the size of queries
+     *
      * @param restTemplate
      * @param projectId
      * @return
