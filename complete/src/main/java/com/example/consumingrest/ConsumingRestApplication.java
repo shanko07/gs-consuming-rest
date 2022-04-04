@@ -1,6 +1,7 @@
 package com.example.consumingrest;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +104,6 @@ public class ConsumingRestApplication {
                 runCodeDxTest(restTemplate, app);
             }
 
-
         };
     }
 
@@ -146,6 +146,8 @@ public class ConsumingRestApplication {
                     String issueTypeId = finding.getJSONObject("relationships").getJSONObject("issue-type")
                             .getJSONObject("data").getString("id");
 
+                    String latestRunId = finding.getJSONObject("relationships").getJSONObject("latest-observed-on-run").getJSONObject("data").getString("id");
+
                     String issueTypeName = getIssueTypeNamePolaris(restTemplate, jwt, issueTypeId);
 
                     String issueSeverity = issueTypeNameToSeverity.getOrDefault(issueTypeName, "Unknown");
@@ -159,6 +161,27 @@ public class ConsumingRestApplication {
 
                     JSONObject triageStatus = getTriageDataPolaris(restTemplate, jwt, projId, finding.getJSONObject(
                             "attributes").getString("issue-key"));
+
+                    String dismissalStatus;
+                    try {
+                        dismissalStatus = triageStatus.getJSONObject("data").getJSONObject("attributes").getString("dismissal-status");
+                    } catch (JSONException e) {
+                        dismissalStatus = "";
+                    }
+
+                    if (dismissalStatus.equals("REQUESTED")) {
+                        JSONObject runInfo = getRunInfoPolaris(restTemplate, jwt, latestRunId);
+
+                        String revId = runInfo.getJSONObject("data").getJSONObject("relationships").getJSONObject("revision").getJSONObject("data").getString("id");
+
+                        String approvalReviewUrl = POLARIS_BASE_URL
+                                + "/projects/" + projId
+                                + "/branches/" + branchId
+                                + "/revisions/" + revId
+                                + "/issues/" + finding.getString("id");
+
+                        log.info("This issue requires dismissal approval.  Please visit the following link to approve " + approvalReviewUrl);
+                    }
 
                     String status = getTriageStatusPolaris(triageStatus);
 
@@ -617,6 +640,37 @@ public class ConsumingRestApplication {
         }
 
         return status;
+    }
+
+    /**
+     *
+     * @param restTemplate
+     * @param jwt
+     * @param runId unique identifier for the scan run in Polaris
+     * @return JSONObject of information about the run
+     */
+    private JSONObject getRunInfoPolaris(RestTemplate restTemplate, String jwt, String runId) {
+        String url =
+                POLARIS_BASE_URL + "/api/common/v0/runs/" + runId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + jwt);
+        headers.set("Accept", "application/vnd.api+json");
+        headers.set("Content-Type", "application/json");
+
+        String urlBuilt = UriComponentsBuilder.fromHttpUrl(url)
+                .buildAndExpand()
+                .toUriString();
+
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity =
+                new HttpEntity<>(new LinkedMultiValueMap<>(), headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                urlBuilt, HttpMethod.GET, requestEntity, String.class);
+
+        String rString = response.getBody();
+        return new JSONObject(rString);
     }
 
     /**
